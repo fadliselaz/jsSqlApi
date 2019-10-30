@@ -1,47 +1,40 @@
 const express = require("express")
-const cors = require("cors")
+// const cors = require("cors")
 const mysql = require("mysql")
 const app = express()
-app.use(cors())
+// app.use(cors())
+
+// const app = express()
 
 // data dari database
 const conn = mysql.createConnection({
-    host : '35.186.145.138',
-    user: "fadliselaz",
-    password : "fadliselaz13",
-    database : "reactSql"
+    host : 'localhost',
+    user: "root",
+    password : "",
+    database : "fadliselaz"
 })
 
 // validasi koneksi
-conn.connect(err =>{
+conn.connect(err => {
     if(err){
-        return err
+        return console.log(err)
+    }else{
+        console.log("databases berhasil terkonek..")
     }
 })
 
 // parameter querynya
-const SELECT_ALL_PRODUCT_QUERY = "SELECT * FROM product"
+const SELECT_ALL_USERS = "SELECT * FROM userdata"
 
 
 app.get("/", (req,res)=>{
-    res.send("go to /product")
+    res.send("go to /userdata")
 })
 
-app.get("/product", (req,res)=>{
-    conn.query(SELECT_ALL_PRODUCT_QUERY, (err, result)=>{
+app.get("/userdata", (req,res)=>{
+    conn.query(SELECT_ALL_USERS, (err, result)=>{
         if(err){
-            return req.send(err)
-        }else{
-            res.json({data : result})
-        }
-    })
-})
-
-app.getMaxListeners("/post", (req, res) => {
-    var nm = "kopi"
-    conn.query(`SELECT * FROM product WHERE name="${nm}"`, (err, result) =>{
-        if(err){
-            return req.send(err)
+            return res.send(err)
         }else{
             res.json({data : result})
         }
@@ -49,19 +42,28 @@ app.getMaxListeners("/post", (req, res) => {
 })
 
 
-app.get("/product/add", (req,res) =>{
-    const {name, price} = req.query
-    console.log(name, price)
-    const INSERT_PRODUCT_QUERY = `INSERT INTO product(name, price) VALUES('${name}',${price})`
-    conn.query(INSERT_PRODUCT_QUERY)
-    res.send(`success adding product ${name} and ${price}`)
-    
+// ini merupakan endpoit untuk menambah user,
+// caranya adalah dengan ke localhost:3000/userdata/add/?username=terserah&password=terserah
+
+app.get("/userdata/add/", (req,res) =>{
+    const {username, password} = req.query
+    if(!username && !password){
+        res.status(404).send("masukan dulu user dan passnya")
+        
+    }else{
+        console.log(username, password)
+        const INSERT_PRODUCT_QUERY = `INSERT INTO userdata(username, password) VALUES('${username}','${password}')`
+        conn.query(INSERT_PRODUCT_QUERY)
+        res.send(`success adding user ${username} and ${password}`)
+    }
+
+   
 })
 
 
 
 
-app.listen(4000, () =>{
+app.listen(3000, () =>{
     console.log("listening to port 3000 ya..");
     
 })
